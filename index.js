@@ -1,3 +1,4 @@
+let messages = [];
 
 async function main () {
     const socket = new WebSocket('wss://irc-ws.chat.twitch.tv:443');
@@ -26,10 +27,16 @@ async function main () {
         message = event.data.replace(chat_msg, "");
         username = match[1];
         console.log(`${username}: ${message}`);
-        let elem = document.createElement('div');
-        elem.style.cssText = 'width:300px;height:100px;background:#ff1493';
-        elem.innerHTML = `${username}: ${message}`;
-        document.body.appendChild(elem);
+        if (messages.length >= 5) {
+          let first = messages.shift();
+          first.classList.remove('first-child');
+          first.parentNode.removeChild(first);
+        }
+        let chatmsg = document.createElement('div');
+        chatmsg.id = 'chatmsg';
+        chatmsg.innerHTML = `${username}: ${message}`;
+        document.querySelector('#chatmsgs').appendChild(chatmsg);
+        messages.push(chatmsg);
     }
 }
 
