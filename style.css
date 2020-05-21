@@ -1,0 +1,36 @@
+body {
+    margin: 0;
+}
+
+#chatmsg {
+    width:300px;
+    max-height:300px;
+    color:white;
+    margin-top:12px;
+    word-wrap: break-word;
+    transition: margin-top 0.5s;
+    animation: fading 0.5s;
+}
+
+#chatmsg:first-child {
+    margin-top: -20px;
+}
+
+#chatmsgs {
+    left: 0px;
+    top: 0px;
+    width: 300px;
+    height: 500px;
+    position: relative;
+    padding-top: 40px;
+    transition: padding-top 0.5s;
+}
+
+#chatmsgs:empty {
+    padding-top: 0px;
+}
+
+@keyframes fading {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
