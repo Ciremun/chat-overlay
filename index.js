@@ -37,7 +37,7 @@ async function main () {
         }
         let chatmsg = document.createElement('div');
         chatmsg.id = 'chatmsg';
-        chatmsg.innerHTML = `<span style=color:${color}>${username}</span>: ${message}`;
+        chatmsg.innerHTML = `<span style=color:${color}>${username}</span> ${message}`;
         document.querySelector('#chatmsgs').appendChild(chatmsg);
         messages.push(chatmsg);
     }
