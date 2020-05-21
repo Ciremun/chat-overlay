@@ -1,12 +1,13 @@
 let messages = [];
+let max_messages = 10;
 
 async function main () {
     const socket = new WebSocket('wss://irc-ws.chat.twitch.tv:443');
 
-    let chat_msg = /^@.*:(\w+)!\w+@\w+\.tmi\.twitch\.tv PRIVMSG #\w+ :/;
-    let data = await fetch('tokens.json').then(res => res.json());
-    let password = data['twitch_bot_token'];
-    let channel = data['channel'];
+    let chat_msg = /^@.*:(\w+)!\w+@\w+\.tmi\.twitch\.tv PRIVMSG #\w+ :/,
+        data = await fetch('tokens.json').then(res => res.json()),
+        password = data['twitch_bot_token'],
+        channel = data['channel'];
 
     socket.onopen = () => {
         socket.send(`PASS ${password}`);
@@ -20,21 +21,23 @@ async function main () {
         if (event.data.startsWith('PING :tmi.twitch.tv')) {
             return socket.send('PONG :tmi.twitch.tv');
         }
-        match = chat_msg.exec(event.data);
-        if (match === null) {
-            return;
+        let username = /display-name=(\w+);/.exec(event.data);
+        if (username === null) {
+          console.log('username is null');
+          return;
         }
-        message = event.data.replace(chat_msg, "");
-        username = match[1];
+        username = username[1];
+        let color = /color=(#[A-Fa-f0-9]{6})/.exec(event.data)[1];
+        let message = event.data.replace(chat_msg, "");
         console.log(`${username}: ${message}`);
-        if (messages.length >= 5) {
+        if (messages.length >= max_messages) {
           let first = messages.shift();
           first.classList.remove('first-child');
           first.parentNode.removeChild(first);
         }
         let chatmsg = document.createElement('div');
         chatmsg.id = 'chatmsg';
-        chatmsg.innerHTML = `${username}: ${message}`;
+        chatmsg.innerHTML = `<span style=color:${color}>${username}</span>: ${message}`;
         document.querySelector('#chatmsgs').appendChild(chatmsg);
         messages.push(chatmsg);
     }

@@ -3,11 +3,11 @@ body {
 }
 
 #chatmsg {
-    width:300px;
-    max-height:300px;
+    width:400px;
     color:white;
     margin-top:12px;
     word-wrap: break-word;
+    font-family: 'Ubuntu Mono', monospace;
     transition: margin-top 0.5s;
     animation: fading 0.5s;
 }
@@ -19,8 +19,8 @@ body {
 #chatmsgs {
     left: 0px;
     top: 0px;
-    width: 300px;
-    height: 500px;
+    width: 400px;
+    height: 800px;
     position: relative;
     padding-top: 40px;
     transition: padding-top 0.5s;
