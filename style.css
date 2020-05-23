@@ -11,8 +11,8 @@ body {
     font-family: 'Ubuntu Mono', monospace;
     text-shadow: 1px 1px 2px black;
     font-size: 18pt;
-    transition: margin-top 0.5s;
-    animation: fading 0.5s;
+    transition: margin-top 0.2s;
+    animation: fade-in 0.4s;
 }
 
 #chatmsg:first-child {
@@ -20,20 +20,23 @@ body {
 }
 
 #chatmsgs {
-    left: 0px;
-    top: 0px;
     width: 400px;
     height: 800px;
     position: relative;
     padding-top: 40px;
-    transition: padding-top 0.5s;
+    transition: padding-top 0.2s;
 }
 
 #chatmsgs:empty {
     padding-top: 0px;
 }
 
-@keyframes fading {
+@keyframes fade-in {
     0% { opacity: 0; }
     100% { opacity: 1; }
+}
+
+@keyframes fade-out {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
 }
