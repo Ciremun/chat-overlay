@@ -30,9 +30,8 @@ async function main () {
         console.log(`${username}: ${message}`);
         if (messages.length >= max_messages) {
             let first = messages.shift();
+            first.addEventListener('animationend', () => first.parentNode.removeChild(first));
             first.style.animation = 'fade-out 0.2s forwards';
-            await new Promise(r => setTimeout(r, 200));
-            first.parentNode.removeChild(first);
           }
         let chatmsg = document.createElement('div');
         chatmsg.id = 'chatmsg';
