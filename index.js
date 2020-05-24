@@ -37,6 +37,25 @@ async function main () {
             tags.badges = tags.badges.split(',').map(x => x.split('/'));
             tags.badges.forEach(x => chatmsg.innerHTML += `<img id="badge" alt="" src="static/${x[0]}${x[1]}.png">`);
         }
+        if (tags.emotes !== '') {
+            let emotes = {};
+            let newmsg = message;
+            tags.emotes.split('/').forEach(x => {
+                x = x.split(':');
+                emotes[x[0]] = x[1].split(',');
+            });
+            Object.keys(emotes).forEach(x => {
+                emotes[x].forEach(y => {
+                    y = y.split('-');
+                    y = y.map(z => parseInt(z));
+                    emote = message.substring(y[0], y[1] + 1);
+                    let reg = new RegExp(`\^${emote}\\s\|\\s${emote}\\s\|\\s${emote}\$`, 'g');
+                    let id; if (tags['emote-only'] === '1') id = 'emoteonly'; else id = 'emote';
+                    newmsg = newmsg.replace(reg, ` <img id="${id}" alt="" src="http://static-cdn.jtvnw.net/emoticons/v1/${x}/3.0"> `);
+                })
+            });
+            message = newmsg;
+        }
         chatmsg.id = 'chatmsg';
         chatmsg.innerHTML += `<span style=color:${color}>${username}</span> ${message}`;
         document.querySelector('#chatmsgs').appendChild(chatmsg);

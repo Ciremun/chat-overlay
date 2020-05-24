@@ -33,7 +33,17 @@ body {
 
 #badge {
     height: 1em;
+    vertical-align: middle;
     margin-right: 8px;
+}
+
+#emote {
+    height: 1.2em;
+    vertical-align: middle;
+}
+
+#emoteonly {
+    height: 2em;
     vertical-align: middle;
 }
 
