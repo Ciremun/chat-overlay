@@ -35,7 +35,7 @@ async function main () {
         event.data.split(';').forEach(x => {x = x.split('='); tags[x[0]] = x[1];});
         if (badges) {
             tags.badges = tags.badges.split(',').map(x => x.split('/'));
-            tags.badges.forEach(x => chatmsg.innerHTML += `<img id="badge" src="static/${x[0]}${x[1]}.png">`);
+            tags.badges.forEach(x => chatmsg.innerHTML += `<img id="badge" alt="" src="static/${x[0]}${x[1]}.png">`);
         }
         chatmsg.id = 'chatmsg';
         chatmsg.innerHTML += `<span style=color:${color}>${username}</span> ${message}`;
