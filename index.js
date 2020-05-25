@@ -27,9 +27,9 @@ function processEmotes(tags, message) {
         });
     }
     if (bttv) {
-        if (typeof window.bttvEmotes !== 'object') console.log('bttvEmotes isnt an object, no emotes for current msg');
+        let bttvEmotes = window.bttvEmotes;
+        if (bttvEmotes.length === 0) console.log('bttvEmotes is empty, no emotes for current msg');
         else {
-            let bttvEmotes = window.bttvEmotes;
             let toReplace = [];
             let count;
             let totalCount = 0;
@@ -75,18 +75,13 @@ async function fetchBttvEmotes(data) {
         response = await fetch(`https://api.betterttv.net/3/cached/users/twitch/${channel_id}`);
         json = await response.json();
         bttv = json['channelEmotes'].concat(json['sharedEmotes']);
-    }
-    catch (err) {
-        console.log('unable to fetch bttv channel emotes');
-    }
+    } catch (e) { console.log('unable to fetch bttv channel emotes'); }
     try {
         response = await fetch('https://api.betterttv.net/3/cached/emotes/global');
         json = await response.json();
+        if (!Array.isArray(json)) throw e;
         bttv = bttv.concat(json);
-    }
-    catch (err) {
-        console.log('unable to fetch bttv global emotes');
-    }
+    } catch (e) { console.log('unable to fetch bttv global emotes'); }
     return bttv;
 }
 
