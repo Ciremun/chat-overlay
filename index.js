@@ -1,14 +1,103 @@
-let messages = [];
 let max_messages = 10;
 let badges = true;
+let bttv = true;
+
+let messages = [];
 const socket = new WebSocket('wss://irc-ws.chat.twitch.tv:443');
+
+function processEmotes(tags, message) {
+    let newmsg = message,
+        id = 'emote',
+        src,
+        regex,
+        emote;
+    if (tags.emotes) {
+        let emotes = {};
+        if (tags['emote-only'] === '1') id = 'emoteonly';
+        tags.emotes.split('/').forEach(x => {
+            x = x.split(':');
+            emotes[x[0]] = x[1].split(',');
+        });
+        Object.keys(emotes).forEach(x => {
+            y = emotes[x][0].split('-').map(z => parseInt(z));
+            emote = message.substring(y[0], y[1] + 1);
+            regex = new RegExp(`${emote}\\s\|\\s${emote}\\s\|\\s${emote}\$`, 'g');
+            src = `http://static-cdn.jtvnw.net/emoticons/v1/${x}/3.0`;
+            newmsg = newmsg.replace(regex, ` <img id="${id}" alt="" src="${src}"> `);
+        });
+    }
+    if (bttv) {
+        if (typeof window.bttvEmotes !== 'object') console.log('bttvEmotes isnt an object, no emotes for current msg');
+        else {
+            let bttvEmotes = window.bttvEmotes;
+            let toReplace = [];
+            let count;
+            let totalCount = 0;
+            for (j = 0; j < bttvEmotes.length; j++) {
+                emote = bttvEmotes[j].code;
+                regex = new RegExp(`${emote}\\s\|\\s${emote}\\s\|\\s${emote}\$`, 'g');
+                count = (message.match(regex) || []).length;
+                if (count === 0) continue;
+                totalCount += count;
+                src = `https://cdn.betterttv.net/emote/${bttvEmotes[j].id}/3x`;
+                toReplace.push({'regex': regex, 'src': src});
+            }
+            if (message.split(' ').length === totalCount) id = 'emoteonly';
+            toReplace.forEach(x => newmsg = newmsg.replace(x.regex, ` <img id="${id}" alt="" src="${x.src}"> `));
+        }
+    }
+    return newmsg;
+}
+
+async function fetchBttvEmotes(data) {
+    let channel_id = data['channel_id'];
+    let channel = data['channel'];
+    let auth = data['twitch_bot_token'];
+    if (channel_id === undefined) {
+        if (data['client_id'] === undefined) {
+            console.log('unable to fetch bttv emotes, put channel/client id into tokens.json');
+            return;
+        }
+        let response = await fetch(`https://api.twitch.tv/helix/users?login=${channel}`, 
+                        {headers: {'Client-ID': data['client_id'], 'Authorization': `Bearer ${auth}`}});
+        let json = await response.json();
+        json = json['data'][0];
+        if (json === undefined) {
+            console.log('unable to fetch channel id');
+            return;
+        }
+        channel_id = json['id'];
+    }
+    let bttv = [];
+    let response;
+    let json;
+    try {
+        response = await fetch(`https://api.betterttv.net/3/cached/users/twitch/${channel_id}`);
+        json = await response.json();
+        bttv = json['channelEmotes'].concat(json['sharedEmotes']);
+    }
+    catch (err) {
+        console.log('unable to fetch bttv channel emotes');
+    }
+    try {
+        response = await fetch('https://api.betterttv.net/3/cached/emotes/global');
+        json = await response.json();
+        bttv = bttv.concat(json);
+    }
+    catch (err) {
+        console.log('unable to fetch bttv global emotes');
+    }
+    return bttv;
+}
 
 async function main () {
 
     let chat_msg = /^@.*:(\w+)!\w+@\w+\.tmi\.twitch\.tv PRIVMSG #\w+ :/,
         data = await fetch('tokens.json').then(res => res.json()),
-        password = data['twitch_bot_token'],
+        password = `oauth:${data['twitch_bot_token']}`,
         channel = data['channel'];
+
+    if (bttv) fetchBttvEmotes(data).then(r => window.bttvEmotes = r);
 
     socket.onopen = () => {
         socket.send(`PASS ${password}`);
@@ -37,25 +126,7 @@ async function main () {
             tags.badges = tags.badges.split(',').map(x => x.split('/'));
             tags.badges.forEach(x => chatmsg.innerHTML += `<img id="badge" alt="" src="static/${x[0]}${x[1]}.png">`);
         }
-        if (tags.emotes !== '') {
-            let emotes = {};
-            let newmsg = message;
-            tags.emotes.split('/').forEach(x => {
-                x = x.split(':');
-                emotes[x[0]] = x[1].split(',');
-            });
-            Object.keys(emotes).forEach(x => {
-                emotes[x].forEach(y => {
-                    y = y.split('-');
-                    y = y.map(z => parseInt(z));
-                    emote = message.substring(y[0], y[1] + 1);
-                    let reg = new RegExp(`\^${emote}\\s\|\\s${emote}\\s\|\\s${emote}\$`, 'g');
-                    let id; if (tags['emote-only'] === '1') id = 'emoteonly'; else id = 'emote';
-                    newmsg = newmsg.replace(reg, ` <img id="${id}" alt="" src="http://static-cdn.jtvnw.net/emoticons/v1/${x}/3.0"> `);
-                })
-            });
-            message = newmsg;
-        }
+        message = processEmotes(tags, message);
         chatmsg.id = 'chatmsg';
         chatmsg.innerHTML += `<span style=color:${color}>${username}</span> ${message}`;
         document.querySelector('#chatmsgs').appendChild(chatmsg);

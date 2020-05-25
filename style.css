@@ -4,7 +4,7 @@ body {
 }
 
 #chatmsg {
-    width:400px;
+    width:430px;
     color:white;
     margin-top:12px;
     word-wrap: break-word;
@@ -20,7 +20,7 @@ body {
 }
 
 #chatmsgs {
-    width: 400px;
+    width: 430px;
     height: 800px;
     position: relative;
     padding-top: 40px;
