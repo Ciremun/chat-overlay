@@ -1,4 +1,5 @@
 let max_messages = 10;
+let ignoredUsers = ['shtcd'];
 let badges = true;
 let bttv = true;
 
@@ -109,6 +110,7 @@ async function main () {
         let username = /display-name=(\w+);/.exec(event.data);
         if (!username) return;
         username = username[1];
+        if (ignoredUsers.includes(username.toLowerCase())) return;
         let color = /color=(#[A-Fa-f0-9]{6})/.exec(event.data)[1];
         let message = event.data.replace(chat_msg, "");
         if (messages.length >= max_messages) {
