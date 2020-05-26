@@ -31,17 +31,19 @@ function processEmotes(tags, message) {
         if (bttvEmotes.length === 0) console.log('bttvEmotes is empty, no emotes for current msg');
         else {
             let toReplace = [];
+            let totalCount = 0;
             let count;
             for (j = 0; j < bttvEmotes.length; j++) {
                 emote = bttvEmotes[j].code;
                 regex = new RegExp(`${emote}\\s\|\\s${emote}\\s\|\\s${emote}\$`, 'g');
                 count = (message.match(regex) || []).length;
                 if (count === 0) continue;
+                totalCount += count;
                 src = `https://cdn.betterttv.net/emote/${bttvEmotes[j].id}/3x`;
                 toReplace.push({'regex': regex, 'src': src});
             }
             if (toReplace.length) {
-                if (message.split(' ').length === toReplace.length) id = 'emoteonly';
+                if (message.split(' ').length === totalCount) id = 'emoteonly';
                 toReplace.forEach(x => newmsg = newmsg.replace(x.regex, ` <img id="${id}" alt="" src="${x.src}"> `));
             }
         }
