@@ -41,7 +41,10 @@ function processEmotes(tags, message) {
                 if (count === 0) continue;
                 totalCount += count;
                 src = `https://cdn.betterttv.net/emote/${bttvEmotes[j].id}/3x`;
-                toReplace.push({'regex': regex, 'src': src});
+                toReplace.push({
+                    'regex': regex,
+                    'src': src
+                });
             }
             if (toReplace.length) {
                 if (message.split(' ').length === totalCount) id = 'emoteonly';
@@ -61,8 +64,12 @@ async function fetchBttvEmotes(data) {
             console.log('unable to fetch bttv emotes, put channel/client id into tokens.json');
             return;
         }
-        let response = await fetch(`https://api.twitch.tv/helix/users?login=${channel}`, 
-                        {headers: {'Client-ID': data['client_id'], 'Authorization': `Bearer ${auth}`}});
+        let response = await fetch(`https://api.twitch.tv/helix/users?login=${channel}`, {
+            headers: {
+                'Client-ID': data['client_id'],
+                'Authorization': `Bearer ${auth}`
+            }
+        });
         let json = await response.json();
         json = json['data'][0];
         if (json === undefined) {
@@ -78,17 +85,21 @@ async function fetchBttvEmotes(data) {
         response = await fetch(`https://api.betterttv.net/3/cached/users/twitch/${channel_id}`);
         json = await response.json();
         bttv = json['channelEmotes'].concat(json['sharedEmotes']);
-    } catch (e) { console.log('unable to fetch bttv channel emotes'); }
+    } catch (e) {
+        console.log('unable to fetch bttv channel emotes');
+    }
     try {
         response = await fetch('https://api.betterttv.net/3/cached/emotes/global');
         json = await response.json();
         if (!Array.isArray(json)) throw e;
         bttv = bttv.concat(json);
-    } catch (e) { console.log('unable to fetch bttv global emotes'); }
+    } catch (e) {
+        console.log('unable to fetch bttv global emotes');
+    }
     return bttv;
 }
 
-async function main () {
+async function main() {
 
     let chat_msg = /^@.*:(\w+)!\w+@\w+\.tmi\.twitch\.tv PRIVMSG #\w+ :/,
         data = await fetch('tokens.json').then(res => res.json()),
@@ -117,10 +128,13 @@ async function main () {
             let first = messages.shift();
             first.addEventListener('animationend', () => first.parentNode.removeChild(first));
             first.style.animation = 'fade-out 0.2s forwards';
-          }
+        }
         let chatmsg = document.createElement('div');
         let tags = {};
-        event.data.split(';').forEach(x => {x = x.split('='); tags[x[0]] = x[1];});
+        event.data.split(';').forEach(x => {
+            x = x.split('=');
+            tags[x[0]] = x[1];
+        });
         if (badges) {
             tags.badges = tags.badges.split(',').map(x => x.split('/'));
             tags.badges.forEach(x => chatmsg.innerHTML += `<img id="badge" alt="" src="static/${x[0]}${x[1]}.png">`);
