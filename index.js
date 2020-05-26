@@ -72,8 +72,11 @@ function processEmotes(tags, message) {
         }
     }
     if (toReplace.length) {
-        if (bttv || ffz) if (message.split(' ').length === totalCount) id = 'emoteonly';
-        else if (tags['emote-only'] === '1') id = 'emoteonly';
+        if (bttv || ffz) {
+            if (message.split(' ').length === totalCount) id = 'emoteonly';
+        } else {
+            if (tags['emote-only'] === '1') id = 'emoteonly';
+        }
         toReplace.forEach(x => newmsg = newmsg.replace(x.regex, ` <img id="${id}" alt="" src="${x.src}"> `));
     }
     return newmsg;
