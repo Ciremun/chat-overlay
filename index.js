@@ -32,18 +32,18 @@ function processEmotes(tags, message) {
         else {
             let toReplace = [];
             let count;
-            let totalCount = 0;
             for (j = 0; j < bttvEmotes.length; j++) {
                 emote = bttvEmotes[j].code;
                 regex = new RegExp(`${emote}\\s\|\\s${emote}\\s\|\\s${emote}\$`, 'g');
                 count = (message.match(regex) || []).length;
                 if (count === 0) continue;
-                totalCount += count;
                 src = `https://cdn.betterttv.net/emote/${bttvEmotes[j].id}/3x`;
                 toReplace.push({'regex': regex, 'src': src});
             }
-            if (message.split(' ').length === totalCount) id = 'emoteonly';
-            toReplace.forEach(x => newmsg = newmsg.replace(x.regex, ` <img id="${id}" alt="" src="${x.src}"> `));
+            if (toReplace.length) {
+                if (message.split(' ').length === toReplace.length) id = 'emoteonly';
+                toReplace.forEach(x => newmsg = newmsg.replace(x.regex, ` <img id="${id}" alt="" src="${x.src}"> `));
+            }
         }
     }
     return newmsg;
