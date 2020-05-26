@@ -77,6 +77,7 @@ async function fetchBttvEmotes(data) {
             return;
         }
         channel_id = json['id'];
+        console.log(`channel_id - ${channel_id}`);
     }
     let bttv = [];
     let response;
