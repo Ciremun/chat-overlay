@@ -2,7 +2,7 @@
 
 simple on-screen twitch chat, supports twitch badges, twitch and bttv emotes  
 
-[animation](./static/animation.gif)  
+![animation](./static/animation.gif)  
 
 ## Install
 
