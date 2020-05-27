@@ -63,16 +63,15 @@ function processEmotes(tags, message) {
 }
 
 async function fetchFFZEmotes(data) {
-    let ffz = [];
     let response = await fetch(`https://api.frankerfacez.com/v1/room/${data['channel']}`);
     let json = await response.json();
     try {
         let set = json.room.set;
-        ffz = json.sets[`${set}`].emoticons;
+        let ffz = json.sets[`${set}`].emoticons;
+        ffz.forEach(x => emotes.push({'name': x.name, 'url': x.urls[4]}));
     } catch (e) {
         console.log('unable to fetch ffz emotes');
     }
-    ffz.forEach(x => emotes.push({'name': x.name, 'url': x.urls[4]}));
 }
 
 async function fetchBttvEmotes(data) {
