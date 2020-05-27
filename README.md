@@ -1,6 +1,6 @@
 # chat-overlay
 
-simple on-screen twitch chat, supports twitch badges, twitch and bttv emotes  
+simple on-screen twitch chat, supports twitch badges, bttv, ffz and twitch emotes  
 
 ![animation](./static/animation.gif)  
 
