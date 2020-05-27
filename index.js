@@ -1,5 +1,6 @@
 const socket = new WebSocket('wss://irc-ws.chat.twitch.tv:443');
 let messages = [],
+    emotes = [],
     maxMessages,
     ignoredUsers,
     badges,
@@ -21,7 +22,6 @@ function processEmotes(tags, message) {
         id = 'emote',
         totalCount = 0,
         toReplace = [],
-        src,
         regex,
         emote;
     if (tags.emotes) {
@@ -34,55 +34,29 @@ function processEmotes(tags, message) {
             y = emotes[x][0].split('-').map(z => parseInt(z));
             emote = message.substring(y[0], y[1] + 1);
             regex = new RegExp(`${emote}\\s\|\\s${emote}\\s\|\\s${emote}\$`, 'g');
-            src = `http://static-cdn.jtvnw.net/emoticons/v1/${x}/3.0`;
             totalCount += emotes[x].length;
             toReplace.push({
                 'regex': regex,
-                'src': src
+                'src': `http://static-cdn.jtvnw.net/emoticons/v1/${x}/3.0`
             });
         });
     }
-    if (bttv) {
-        let bttvEmotes = window.bttvEmotes;
-        if (bttvEmotes.length === 0) console.log('bttvEmotes is empty, no bttv emotes for current msg');
-        else {
-            let count;
-            for (j = 0; j < bttvEmotes.length; j++) {
-                emote = bttvEmotes[j].code;
-                regex = new RegExp(`${emote}\\s\|\\s${emote}\\s\|\\s${emote}\$`, 'g');
-                count = (message.match(regex) || []).length;
-                if (count === 0) continue;
-                totalCount += count;
-                src = `https://cdn.betterttv.net/emote/${bttvEmotes[j].id}/3x`;
-                toReplace.push({
-                    'regex': regex,
-                    'src': src
-                });
-            }
-        }
-    }
-    if (ffz) {
-        let ffzEmotes = window.ffzEmotes;
-        if (ffzEmotes.length === 0) console.log('ffzEmotes is empty, no ffz emotes for current msg');
-        else {
-            let count;
-            for (j = 0; j < ffzEmotes.length; j++) {
-                emote = ffzEmotes[j].name;
-                regex = new RegExp(`${emote}\\s\|\\s${emote}\\s\|\\s${emote}\$`, 'g');
-                count = (message.match(regex) || []).length;
-                if (count === 0) continue;
-                totalCount += count;
-                src = ffzEmotes[j].urls[4];
-                toReplace.push({
-                    'regex': regex,
-                    'src': src
-                });
-            }
+    if (emotes.length) {
+        let count;
+        for (j = 0; j < emotes.length; j++) {
+            emote = emotes[j].name;
+            regex = new RegExp(`${emote}\\s\|\\s${emote}\\s\|\\s${emote}\$`, 'g');
+            count = (message.match(regex) || []).length;
+            if (count === 0) continue;
+            totalCount += count;
+            toReplace.push({
+                'regex': regex,
+                'src': emotes[j].url
+            });
         }
     }
     if (toReplace.length) {
-        if ((bttv || ffz) && message.split(' ').length === totalCount) id = 'emoteonly';
-        else if (tags['emote-only'] === '1') id = 'emoteonly';
+        if (((bttv || ffz) && message.split(' ').length === totalCount) || tags['emote-only'] === '1') id = 'emoteonly';
         toReplace.forEach(x => newmsg = newmsg.replace(x.regex, ` <img id="${id}" alt="" src="${x.src}"> `));
     }
     return newmsg;
@@ -98,7 +72,7 @@ async function fetchFFZEmotes(data) {
     } catch (e) {
         console.log('unable to fetch ffz emotes');
     }
-    return ffz;
+    ffz.forEach(x => emotes.push({'name': x.name, 'url': x.urls[4]}));
 }
 
 async function fetchBttvEmotes(data) {
@@ -143,7 +117,7 @@ async function fetchBttvEmotes(data) {
     } catch (e) {
         console.log('unable to fetch bttv global emotes');
     }
-    return bttv;
+    bttv.forEach(x => emotes.push({'name': x.code, 'url': `https://cdn.betterttv.net/emote/${x.id}/3x`}));
 }
 
 async function main() {
@@ -153,8 +127,8 @@ async function main() {
         password = `oauth:${data['twitch_bot_token']}`,
         channel = data['channel'];
 
-    if (bttv) fetchBttvEmotes(data).then(r => window.bttvEmotes = r);
-    if (ffz) fetchFFZEmotes(data).then(r => window.ffzEmotes = r);
+    if (bttv) fetchBttvEmotes(data);
+    if (ffz) fetchFFZEmotes(data);
 
     socket.onopen = () => {
         socket.send(`PASS ${password}`);
