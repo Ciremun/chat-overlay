@@ -6,13 +6,15 @@ let messages = [],
     bttv,
     ffz;
 
-fetch('config.json').then(r => r.json().then(cfg => {
-    maxMessages = cfg.maxMessages;
-    ignoredUsers = cfg.ignoredUsers;
-    badges = cfg.badges;
-    bttv = cfg.bttv;
-    ffz = cfg.ffz;
-}));
+fetch('config.json')
+    .then(r => r.json())
+    .then(cfg => {
+        maxMessages = cfg.maxMessages;
+        ignoredUsers = cfg.ignoredUsers;
+        badges = cfg.badges;
+        bttv = cfg.bttv;
+        ffz = cfg.ffz;
+    });
 
 function processEmotes(tags, message) {
     let newmsg = message,
