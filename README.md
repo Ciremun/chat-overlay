@@ -28,9 +28,9 @@ Node.js http-server:
     cd chat-overlay
     http-server
 
-### config
+### config.json
 
-`max_messages` (integer): max number of messages on screen at once  
+`maxMessages` (integer): max number of messages on screen at once  
 `ignoredUsers` (array of strings): twitch usernames in lower case, ignored user's messages not displayed  
 `badges` (boolean): show badges?  
 `bttv` (boolean): fetch and display bttv emotes?  
