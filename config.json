@@ -1,0 +1,7 @@
+{
+    "maxMessages": 10,
+    "ignoredUsers": ["shtcd"],
+    "badges": true,
+    "bttv": true,
+    "ffz": true
+}

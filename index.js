@@ -1,11 +1,18 @@
-let max_messages = 10;
-let ignoredUsers = ['shtcd'];
-let badges = true;
-let bttv = true;
-let ffz = true;
-
-let messages = [];
 const socket = new WebSocket('wss://irc-ws.chat.twitch.tv:443');
+let messages = [],
+    maxMessages,
+    ignoredUsers,
+    badges,
+    bttv,
+    ffz;
+
+fetch('config.json').then(r => r.json().then(cfg => {
+    maxMessages = cfg.maxMessages;
+    ignoredUsers = cfg.ignoredUsers;
+    badges = cfg.badges;
+    bttv = cfg.bttv;
+    ffz = cfg.ffz;
+}));
 
 function processEmotes(tags, message) {
     let newmsg = message,
@@ -163,7 +170,7 @@ async function main() {
         if (ignoredUsers.includes(username.toLowerCase())) return;
         let color = /color=(#[A-Fa-f0-9]{6})/.exec(event.data)[1];
         let message = event.data.replace(chat_msg, "");
-        if (messages.length >= max_messages) {
+        if (messages.length >= maxMessages) {
             let first = messages.shift();
             first.addEventListener('animationend', () => first.parentNode.removeChild(first));
             first.style.animation = 'fade-out 0.2s forwards';
