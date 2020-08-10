@@ -17,6 +17,10 @@ fetch('config.json')
         ffz = cfg.ffz;
     });
 
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function processEmotes(tags, message) {
     let newmsg = message,
         id = 'emote',
@@ -33,6 +37,7 @@ function processEmotes(tags, message) {
         Object.keys(emotes).forEach(x => {
             y = emotes[x][0].split('-').map(z => parseInt(z));
             emote = message.substring(y[0], y[1] + 1);
+            emote = escapeRegExp(emote);
             regex = new RegExp(`${emote}\\s\|\\s${emote}\\s\|\\s${emote}\$`, 'g');
             totalCount += emotes[x].length;
             toReplace.push({
@@ -45,6 +50,7 @@ function processEmotes(tags, message) {
         let count;
         for (j = 0; j < emotes.length; j++) {
             emote = emotes[j].name;
+            emote = escapeRegExp(emote);
             regex = new RegExp(`${emote}\\s\|\\s${emote}\\s\|\\s${emote}\$`, 'g');
             count = (message.match(regex) || []).length;
             if (count === 0) continue;
