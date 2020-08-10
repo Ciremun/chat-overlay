@@ -143,7 +143,9 @@ async function main() {
         if (!username) return;
         username = username[1];
         if (ignoredUsers.includes(username.toLowerCase())) return;
-        let color = /color=(#[A-Fa-f0-9]{6})/.exec(event.data)[1];
+        let color = /color=(#[A-Fa-f0-9]{6})/.exec(event.data);
+        if (color !== null) color = color[1]
+        else color = '#aabbcc';
         let message = event.data.replace(chat_msg, "");
         if (messages.length >= maxMessages) {
             let first = messages.shift();
